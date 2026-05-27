@@ -1,5 +1,7 @@
 API_KEY=dev-test-key-change-me
 ANTHROPIC_API_KEY=sk-ant-xxx
+ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic
+ANTHROPIC_MODEL=deepseek-v4-flash
 
 # Required: at-rest encryption key for credentials.auth and
 # model_cards.api_key_cipher. Workers throw at first request if missing.

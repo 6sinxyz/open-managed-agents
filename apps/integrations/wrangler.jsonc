@@ -18,7 +18,7 @@
   // For self-host: typically https://integrations.<your-domain> or the
   // integrations *.workers.dev URL. setup-cf.sh fills it in.
   "vars": {
-    "GATEWAY_ORIGIN": "<set-by-setup-cf-sh>"
+    "GATEWAY_ORIGIN": "https://managed-agents-integrations.e2d9809a.workers.dev"
   },
 
   // Keep the *.workers.dev URL alive alongside the custom domain — useful
@@ -31,8 +31,8 @@
   //   - INTEGRATIONS_DB : integration subsystem tables (linear_* / github_*
   //                        / slack_*).
   "d1_databases": [
-    { "binding": "MAIN_DB",         "database_name": "openma-auth",         "database_id": "<set-by-setup-cf-sh>" },
-    { "binding": "INTEGRATIONS_DB", "database_name": "openma-integrations", "database_id": "<set-by-setup-cf-sh>" }
+    { "binding": "MAIN_DB",         "database_name": "openma-auth",         "database_id": "da8a5feb-aa28-4337-8e20-a02590951fa4" },
+    { "binding": "INTEGRATIONS_DB", "database_name": "openma-integrations", "database_id": "4ab1bb23-811e-451a-a20c-ad7efafe3baf" }
   ],
 
   // Service binding back to the main worker for session creation / resume.

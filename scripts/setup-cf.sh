@@ -104,15 +104,23 @@ if ! npx wrangler whoami 2>&1 | grep -q "logged in"; then
 fi
 ok "wrangler logged in as $(npx wrangler whoami 2>&1 | grep -oE '[^ ]+@[^ ]+' | head -1)"
 
-# Anthropic key — required.
+# Anthropic-compatible key — required. The default personal deploy in this
+# fork points at DeepSeek's Anthropic-compatible endpoint; operators can still
+# override ANTHROPIC_BASE_URL / ANTHROPIC_MODEL before running this script.
 if [ -n "${ANTHROPIC_API_KEY:-}" ]; then
   ok "ANTHROPIC_API_KEY from env"
 else
-  read -rsp "  Anthropic API key (sk-ant-...): " ANTHROPIC_API_KEY
+  read -rsp "  Anthropic-compatible API key: " ANTHROPIC_API_KEY
   echo
   [ -n "$ANTHROPIC_API_KEY" ] || die "ANTHROPIC_API_KEY is required"
 fi
 export ANTHROPIC_API_KEY
+
+ANTHROPIC_BASE_URL="${ANTHROPIC_BASE_URL:-https://api.deepseek.com/anthropic}"
+ANTHROPIC_MODEL="${ANTHROPIC_MODEL:-deepseek-v4-flash}"
+export ANTHROPIC_BASE_URL ANTHROPIC_MODEL
+ok "ANTHROPIC_BASE_URL -> $ANTHROPIC_BASE_URL"
+ok "ANTHROPIC_MODEL -> $ANTHROPIC_MODEL"
 
 # ── 1. create resources ─────────────────────────────────────────────────
 say "1. Provision Cloudflare resources (idempotent)"
@@ -219,7 +227,7 @@ patch_var() {
 }
 
 # apps/main: AUTH_DB + INTEGRATIONS_DB + CONFIG_KV + INTEGRATIONS_ORIGIN
-patch_d1 apps/main/wrangler.jsonc AUTH_DB         "$AUTH_DB_ID"
+patch_d1 apps/main/wrangler.jsonc MAIN_DB         "$AUTH_DB_ID"
 patch_d1 apps/main/wrangler.jsonc INTEGRATIONS_DB "$INTEGRATIONS_DB_ID"
 patch_kv apps/main/wrangler.jsonc CONFIG_KV       "$CONFIG_KV_ID"
 # Default INTEGRATIONS_ORIGIN to the integrations workers.dev URL — user
@@ -227,13 +235,15 @@ patch_kv apps/main/wrangler.jsonc CONFIG_KV       "$CONFIG_KV_ID"
 patch_var apps/main/wrangler.jsonc INTEGRATIONS_ORIGIN \
   "https://managed-agents-integrations.${ACCOUNT_ID:0:8}.workers.dev"
 
-# apps/agent: AUTH_DB + CONFIG_KV + CLOUDFLARE_ACCOUNT_ID
-patch_d1 apps/agent/wrangler.jsonc AUTH_DB   "$AUTH_DB_ID"
+# apps/agent: MAIN_DB + CONFIG_KV + CLOUDFLARE_ACCOUNT_ID
+patch_d1 apps/agent/wrangler.jsonc MAIN_DB   "$AUTH_DB_ID"
 patch_kv apps/agent/wrangler.jsonc CONFIG_KV "$CONFIG_KV_ID"
 patch_var apps/agent/wrangler.jsonc CLOUDFLARE_ACCOUNT_ID "$ACCOUNT_ID"
+patch_var apps/agent/wrangler.jsonc ANTHROPIC_BASE_URL "$ANTHROPIC_BASE_URL"
+patch_var apps/agent/wrangler.jsonc ANTHROPIC_MODEL "$ANTHROPIC_MODEL"
 
 # apps/integrations: AUTH_DB + INTEGRATIONS_DB + GATEWAY_ORIGIN
-patch_d1 apps/integrations/wrangler.jsonc AUTH_DB         "$AUTH_DB_ID"
+patch_d1 apps/integrations/wrangler.jsonc MAIN_DB         "$AUTH_DB_ID"
 patch_d1 apps/integrations/wrangler.jsonc INTEGRATIONS_DB "$INTEGRATIONS_DB_ID"
 patch_var apps/integrations/wrangler.jsonc GATEWAY_ORIGIN \
   "https://managed-agents-integrations.${ACCOUNT_ID:0:8}.workers.dev"

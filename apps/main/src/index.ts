@@ -113,7 +113,8 @@ app.on(["GET", "POST"], "/auth/*", async (c) => {
 // Auth info endpoint (public — tells the frontend which providers are enabled
 // and surfaces the Turnstile site key so the Login page can render the widget).
 app.get("/auth-info", (c) => {
-  const providers: string[] = ["email", "email-otp"];
+  const providers: string[] = ["email"];
+  if (c.env.AUTH_REQUIRE_EMAIL_VERIFY === "1") providers.push("email-otp");
   if (c.env.GOOGLE_CLIENT_ID && c.env.GOOGLE_CLIENT_SECRET) {
     providers.push("google");
   }

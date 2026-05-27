@@ -17,7 +17,7 @@ import type { ModelCard } from "@open-managed-agents/api-types";
 // set + the form's tile picker must stay in sync with this list.
 const PROVIDERS = [
   { value: "ant", label: "Anthropic", desc: "Claude models" },
-  { value: "ant-compatible", label: "Anthropic-compatible", desc: "Proxies speaking Anthropic API" },
+  { value: "ant-compatible", label: "Anthropic-compatible", desc: "DeepSeek or proxies speaking Anthropic API" },
   { value: "oai", label: "OpenAI", desc: "GPT models" },
   { value: "oai-compatible", label: "OpenAI-compatible", desc: "DeepSeek, Groq, Together, Ollama, etc." },
 ] as const;
@@ -424,7 +424,9 @@ export function ModelCardsList() {
               className={inputCls}
               placeholder={form.model_id || (OFFICIAL_PROVIDERS.has(form.provider)
                 ? (form.provider === "ant" ? "claude-sonnet-4-6" : "gpt-4o")
-                : "e.g. deepseek-chat, llama-3.1-70b, ...")}
+                : form.provider === "ant-compatible"
+                  ? "deepseek-v4-flash or deepseek-v4-pro"
+                  : "e.g. deepseek-chat, llama-3.1-70b, ...")}
               autoComplete="off" name="model-field" />
             {showModelSuggestions && availableModels.length > 0 && (
               <div className="absolute z-10 w-full mt-1 bg-bg border border-border rounded-md shadow-lg py-1 max-h-48 overflow-y-auto">
@@ -448,7 +450,7 @@ export function ModelCardsList() {
             <div>
               <label htmlFor="modelcard-base-url" className="text-sm text-fg-muted block mb-1">Base URL *</label>
               <input id="modelcard-base-url" value={form.base_url} onChange={(e) => setForm({ ...form, base_url: e.target.value })} className={inputCls}
-                placeholder={form.provider === "ant-compatible" ? "https://your-proxy.com/v1" : "https://api.deepseek.com/v1"} autoComplete="off" />
+                placeholder={form.provider === "ant-compatible" ? "https://api.deepseek.com/anthropic" : "https://api.deepseek.com/v1"} autoComplete="off" />
             </div>
           )}
           {!OFFICIAL_PROVIDERS.has(form.provider) && (

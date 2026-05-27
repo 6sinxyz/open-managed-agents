@@ -36,14 +36,14 @@
   },
 
   "kv_namespaces": [
-    { "binding": "CONFIG_KV", "id": "<set-by-setup-cf-sh>" }
+    { "binding": "CONFIG_KV", "id": "482b4f4e95c54b8ab629b8f1a1d207e9" }
   ],
 
   // D1 layout — single-D1 self-host baseline. Same auto-detection as
   // apps/main/wrangler.jsonc: when AUTH_DB_01 isn't bound, the shared
   // MemoryStoreService resolves every tenant to MAIN_DB.
   "d1_databases": [
-    { "binding": "MAIN_DB", "database_name": "openma-auth", "database_id": "<set-by-setup-cf-sh>" }
+    { "binding": "MAIN_DB", "database_name": "openma-auth", "database_id": "da8a5feb-aa28-4337-8e20-a02590951fa4" }
   ],
 
   // Service bindings:
@@ -80,7 +80,9 @@
     "MEMORY_BUCKET_NAME": "managed-agents-memory",
     "WORKSPACE_BUCKET_NAME": "managed-agents-workspace",
     "BACKUP_BUCKET_NAME": "managed-agents-backups",
-    "CLOUDFLARE_ACCOUNT_ID": "<set-by-setup-cf-sh>"
+    "CLOUDFLARE_ACCOUNT_ID": "e2d9809af7ce19ddf69f0ba687e678ac",
+    "ANTHROPIC_BASE_URL": "https://api.deepseek.com/anthropic",
+    "ANTHROPIC_MODEL": "deepseek-v4-flash"
   },
 
   "r2_buckets": [

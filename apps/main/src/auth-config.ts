@@ -55,7 +55,7 @@ export function createAuth(env: Env) {
     secret: env.BETTER_AUTH_SECRET,
     emailAndPassword: {
       enabled: true,
-      requireEmailVerification: true,
+      requireEmailVerification: env.AUTH_REQUIRE_EMAIL_VERIFY === "1",
       sendResetPassword: async ({ user, url }) => {
         await sendEmail(
           env,
@@ -76,7 +76,7 @@ export function createAuth(env: Env) {
           `Verify your email: ${url}`,
         );
       },
-      sendOnSignUp: true,
+      sendOnSignUp: env.AUTH_REQUIRE_EMAIL_VERIFY === "1",
       autoSignInAfterVerification: true,
     },
     plugins: [

@@ -84,6 +84,10 @@ export interface Env {
    *  per-host scoping. */
   AUTH_COOKIE_DOMAIN?: string;
   AUTH_COOKIE_NAME?: string;
+  /** Require email OTP verification before sign-up/login completes. Disabled
+   *  by default for self-host/local dev unless SMTP or another email sender is
+   *  configured. */
+  AUTH_REQUIRE_EMAIL_VERIFY?: string;
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_CLIENT_SECRET?: string;
   // Pre-registered OAuth client_id/secret per provider, for MCP servers
