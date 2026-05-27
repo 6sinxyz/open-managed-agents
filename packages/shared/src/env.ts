@@ -77,6 +77,10 @@ export interface Env {
   TURNSTILE_SECRET_KEY?: string;
   API_KEY: string;
   BETTER_AUTH_SECRET: string;
+  /** Public origin for Better Auth callback/url generation in Workers. */
+  BETTER_AUTH_URL?: string;
+  /** Verified Cloudflare Email Routing sender, e.g. "openma <noreply@example.com>". */
+  AUTH_EMAIL_FROM?: string;
   /** When set, the better-auth session cookie is scoped to this domain
    *  (leading dot for cross-subdomain). Typical value on hosted:
    *  ".openma.dev" so app.openma.dev's auth cookie is also visible from

@@ -46,13 +46,14 @@ export function Login() {
     turnstile_site_key?: string | null;
   }>("/auth-info");
   const googleEnabled = !!authInfo?.providers?.includes("google");
+  const emailOtpEnabled = !!authInfo?.providers?.includes("email-otp");
   // Whether the backend gates sign-up behind an email-OTP verification.
   // /auth-info advertises "email-otp" iff AUTH_REQUIRE_EMAIL_VERIFY=1 on
   // the server. When absent (default self-host), the sign-up flow does
   // NOT route through verify-signup — sign-up succeeds → session cookie
   // → straight to /. Avoids stranding the user on a verify screen with
   // no way to receive the code.
-  const emailVerifyRequired = !!authInfo?.providers?.includes("email-otp");
+  const emailVerifyRequired = emailOtpEnabled;
   // Turnstile site key (public) is read from /auth-info; null when the
   // backend hasn't been configured yet, in which case the auth middleware
   // also soft-passes — both sides agree to skip the check.
@@ -455,7 +456,7 @@ export function Login() {
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label htmlFor="auth-password" className="text-sm text-fg-muted">Password</label>
-                {mode === "login" && (
+                {mode === "login" && emailOtpEnabled && (
                   <button
                     type="button"
                     onClick={() => {
@@ -599,16 +600,20 @@ export function Login() {
         <p className="text-sm text-fg-muted text-center">
           {mode === "login" && (
             <>
-              <button
-                onClick={() => {
-                  setMode("otp-login");
-                  setError("");
-                }}
-                className="inline-flex items-center min-h-11 sm:min-h-0 text-brand hover:underline"
-              >
-                Sign in with email code
-              </button>
-              <span className="mx-2">&middot;</span>
+              {emailOtpEnabled && (
+                <>
+                  <button
+                    onClick={() => {
+                      setMode("otp-login");
+                      setError("");
+                    }}
+                    className="inline-flex items-center min-h-11 sm:min-h-0 text-brand hover:underline"
+                  >
+                    Sign in with email code
+                  </button>
+                  <span className="mx-2">&middot;</span>
+                </>
+              )}
               <button
                 onClick={() => {
                   setMode("signup");

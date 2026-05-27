@@ -47,6 +47,7 @@
   // worker's *.workers.dev URL. setup-cf.sh fills it in.
   "vars": {
     "INTEGRATIONS_ORIGIN": "https://managed-agents-integrations.e2d9809a.workers.dev",
+    "BETTER_AUTH_URL": "https://managed-agents.thecatcner.workers.dev",
     "TURNSTILE_SITE_KEY": ""
   },
 

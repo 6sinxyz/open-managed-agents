@@ -16,12 +16,13 @@ function sendEmail(
   html: string,
   text: string,
 ) {
-  if (!env.SEND_EMAIL) {
-    console.log(`[auth] email not sent to ${to} (SEND_EMAIL binding not configured): ${subject}`);
+  const from = env.AUTH_EMAIL_FROM?.trim();
+  if (!env.SEND_EMAIL || !from) {
+    console.log(`[auth] email not sent to ${to} (email sender not configured): ${subject}`);
     return;
   }
   return env.SEND_EMAIL.send({
-    from: "openma <noreply@openma.dev>",
+    from,
     to,
     subject,
     html,
@@ -52,6 +53,7 @@ export function createAuth(env: Env) {
 
   return betterAuth({
     basePath: "/auth",
+    baseURL: env.BETTER_AUTH_URL,
     secret: env.BETTER_AUTH_SECRET,
     emailAndPassword: {
       enabled: true,
@@ -83,7 +85,7 @@ export function createAuth(env: Env) {
       emailOTP({
         otpLength: 6,
         expiresIn: 300,
-        sendVerificationOnSignUp: true,
+        sendVerificationOnSignUp: env.AUTH_REQUIRE_EMAIL_VERIFY === "1",
         async sendVerificationOTP({ email, otp, type }) {
           const labels: Record<string, string> = {
             "sign-in": "Your sign-in code",

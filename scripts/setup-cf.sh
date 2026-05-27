@@ -254,18 +254,48 @@ say "3. Apply D1 migrations"
 apply_migrations() {
   local db_name="$1" dir="$2"
   echo "  → $db_name (from $dir)"
-  npx wrangler d1 migrations apply "$db_name" --remote --config apps/main/wrangler.jsonc \
-    --migrations-dir "$dir" 2>&1 | grep -E '(Applied|No migrations)' || true
+  local tmp
+  tmp="$(mktemp -d)"
+  ln -s "$ROOT_DIR/apps/main/wrangler.jsonc" "$tmp/wrangler.jsonc"
+  ln -s "$ROOT_DIR/$dir" "$tmp/migrations"
+  (cd "$tmp" && yes | "$ROOT_DIR/node_modules/.bin/wrangler" d1 migrations apply "$db_name" --remote --config "$tmp/wrangler.jsonc")
+  rm -rf "$tmp"
 }
 
-apply_migrations "openma-auth"         "apps/main/migrations"
-apply_migrations "openma-integrations" "apps/main/migrations-integrations"
-# ROUTER_DB is the same physical DB as AUTH_DB in single-D1 mode (the
-# code falls back via env.ROUTER_DB ?? env.AUTH_DB). The router tables
-# (tenant_shard, shard_pool, memory_store_tenant) are also in the AUTH_DB
-# consolidated migration as a back-compat carry-over, so we don't apply
-# migrations-router/ in single-D1 mode. For multi-shard prod, the
-# operator runs `wrangler d1 migrations apply openma-router` separately.
+apply_single_migration() {
+  local db_name="$1" src="$2"
+  local tmp
+  tmp="$(mktemp -d)"
+  mkdir -p "$tmp/migrations"
+  ln -s "$ROOT_DIR/apps/main/wrangler.jsonc" "$tmp/wrangler.jsonc"
+  ln -s "$ROOT_DIR/$src" "$tmp/migrations/$(basename "$src")"
+  echo "  → $db_name (from $src)"
+  (cd "$tmp" && yes | "$ROOT_DIR/node_modules/.bin/wrangler" d1 migrations apply "$db_name" --remote --config "$tmp/wrangler.jsonc")
+  rm -rf "$tmp"
+}
+
+stamp_migration() {
+  local db_name="$1" filename="$2"
+  echo "  → $db_name (stamp $filename)"
+  npx wrangler d1 execute "$db_name" --remote \
+    --command "INSERT OR IGNORE INTO d1_migrations (name, applied_at) VALUES ('$filename', CURRENT_TIMESTAMP);" \
+    > /dev/null
+}
+
+apply_migrations "openma-auth" "apps/main/migrations"
+# Single-D1 self-host still needs router tables in the auth DB because
+# ensureTenant writes tenant_shard and cron scans shard_pool.
+apply_migrations "openma-auth" "apps/main/migrations-router"
+
+# The integrations consolidated baseline already includes the additive
+# 0002-0006 schema. Apply only the baseline on fresh DBs, then stamp the
+# absorbed filenames so future wrangler runs do not retry duplicate columns.
+apply_single_migration "openma-integrations" "apps/main/migrations-integrations/0001_consolidated.sql"
+stamp_migration "openma-integrations" "0002_slack_publication_first.sql"
+stamp_migration "openma-integrations" "0003_github_publication_first.sql"
+stamp_migration "openma-integrations" "0004_linear_publication_first.sql"
+stamp_migration "openma-integrations" "0005_github_issue_sessions.sql"
+stamp_migration "openma-integrations" "0006_github_trigger_label.sql"
 
 # ── 4. set secrets ──────────────────────────────────────────────────────
 if [ "$SKIP_SECRETS" = "0" ]; then
