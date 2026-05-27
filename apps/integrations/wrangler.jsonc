@@ -18,13 +18,16 @@
   // For self-host: typically https://integrations.<your-domain> or the
   // integrations *.workers.dev URL. setup-cf.sh fills it in.
   "vars": {
-    "GATEWAY_ORIGIN": "https://managed-agents-integrations.e2d9809a.workers.dev"
+    "GATEWAY_ORIGIN": "https://agents-integrations.staylingo.uk"
   },
 
   // Keep the *.workers.dev URL alive alongside the custom domain — useful
   // for incident debugging when the zone is having issues, and the only
   // reachable URL when self-hosters don't bring a custom domain.
   "workers_dev": true,
+  "routes": [
+    { "pattern": "agents-integrations.staylingo.uk", "custom_domain": true }
+  ],
 
   // Two D1 bindings:
   //   - MAIN_DB         : control-plane (user / tenant lookup, vault refs).
