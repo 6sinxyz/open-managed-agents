@@ -8,6 +8,8 @@ interface ProviderModel {
   name: string;
 }
 
+const PROVIDER_MODELS_TIMEOUT_MS = 10_000;
+
 // POST /v1/models/list — fetch models from official provider API using caller's key
 // Body: { provider: "ant" | "oai", api_key: string }
 app.post("/list", async (c) => {
@@ -27,7 +29,7 @@ app.post("/list", async (c) => {
 
 async function fetchModels(provider: string, apiKey: string): Promise<ProviderModel[]> {
   if (provider === "ant") {
-    const res = await fetch("https://api.anthropic.com/v1/models?limit=100", {
+    const res = await fetchProviderModels("https://api.anthropic.com/v1/models?limit=100", {
       headers: {
         "x-api-key": apiKey,
         "anthropic-version": "2023-06-01",
@@ -41,7 +43,7 @@ async function fetchModels(provider: string, apiKey: string): Promise<ProviderMo
   }
 
   if (provider === "oai") {
-    const res = await fetch("https://api.openai.com/v1/models", {
+    const res = await fetchProviderModels("https://api.openai.com/v1/models", {
       headers: { Authorization: `Bearer ${apiKey}` },
     });
     if (!res.ok) throw new Error(`OpenAI API ${res.status}`);
@@ -56,6 +58,16 @@ async function fetchModels(provider: string, apiKey: string): Promise<ProviderMo
   }
 
   return [];
+}
+
+async function fetchProviderModels(url: string, init: RequestInit): Promise<Response> {
+  const ac = new AbortController();
+  const timeout = setTimeout(() => ac.abort("provider models request timed out"), PROVIDER_MODELS_TIMEOUT_MS);
+  try {
+    return await fetch(url, { ...init, signal: ac.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 export default app;

@@ -24,7 +24,8 @@ you in the advisory unless you prefer to remain anonymous.
 In scope:
 - The runtime (`apps/agent`, `apps/main`, `apps/main-node`,
   `apps/integrations`, `apps/oma-vault`)
-- Published packages (`@openma/cli`, `@openma/sdk`)
+- Published packages (`@openma/cli`; `@openma/sdk` is deprecated but remains
+  in scope while the reference package is kept in the repo)
 - Self-host deployment paths documented in `docs/self-host.md`
 
 Out of scope:
