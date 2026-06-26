@@ -39,7 +39,7 @@
 
 ---
 
-Official TypeScript SDK for the [openma](https://openma.dev) managed agents platform — typed REST + SSE streaming, runs anywhere `fetch` exists (Node ≥ 20, Bun, Deno, browsers, Cloudflare Workers).
+Legacy TypeScript SDK for the [openma](https://openma.dev) managed agents platform — typed REST + SSE streaming, runs anywhere `fetch` exists (Node ≥ 20, Bun, Deno, browsers, Cloudflare Workers). This package is retained as a reference implementation; new projects should use `@anthropic-ai/sdk` with `baseURL: "https://openma.dev"`.
 
 ## Install
 
@@ -173,4 +173,4 @@ new OpenMA({ bearer: cookieToken, activeTenantId: "tn_..." });
 
 ## License
 
-MIT — see [LICENSE](https://github.com/open-ma/open-managed-agents/blob/main/LICENSE).
+MIT — see [LICENSE](https://github.com/openma-ai/open-managed-agents/blob/main/LICENSE).

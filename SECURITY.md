@@ -7,7 +7,7 @@ report it privately. **Do not file a public GitHub issue for security
 issues.**
 
 Report via GitHub's private vulnerability reporting:
-https://github.com/open-ma/open-managed-agents/security/advisories/new
+https://github.com/openma-ai/open-managed-agents/security/advisories/new
 
 Please include:
 - A description of the issue and its potential impact
@@ -24,7 +24,8 @@ you in the advisory unless you prefer to remain anonymous.
 In scope:
 - The runtime (`apps/agent`, `apps/main`, `apps/main-node`,
   `apps/integrations`, `apps/oma-vault`)
-- Published packages (`@openma/cli`, `@openma/sdk`)
+- Published packages (`@openma/cli`; `@openma/sdk` is deprecated but remains
+  in scope while the reference package is kept in the repo)
 - Self-host deployment paths documented in `docs/self-host.md`
 
 Out of scope:

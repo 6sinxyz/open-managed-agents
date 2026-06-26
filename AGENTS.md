@@ -729,12 +729,16 @@ When investigating platform or agent issues, follow this loop. **Do not skip ste
 
 ---
 
-## Releasing `@openma/cli` and `@openma/sdk`
+## Releasing `@openma/cli`
 
-We use [changesets](https://github.com/changesets/changesets) for the two
-public npm packages. Internal `@open-managed-agents/*` packages never publish.
+We use [changesets](https://github.com/changesets/changesets) for the public
+CLI package. Internal `@open-managed-agents/*` packages never publish.
 
-**Per PR (only if you touched `packages/cli` or `packages/sdk`):**
+`@openma/sdk` is deprecated. Its source remains in `packages/sdk` for
+reference, but no new versions are published; new client integrations should
+use `@anthropic-ai/sdk` with `baseURL: "https://openma.dev"`.
+
+**Per PR (only if you touched `packages/cli`):**
 
 ```bash
 pnpm changeset
